@@ -9,7 +9,7 @@ from datetime import datetime
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
-from database.orm_db import Base
+from src.database.orm_db import Base
 
 class User(Base):
     __tablename__ = "tb_users"
