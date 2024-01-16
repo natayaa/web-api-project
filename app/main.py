@@ -26,5 +26,5 @@ async def api_handler(request: Request, exc: HTTPException):
     return_values = {"request": Request, "headers": {"WWW-Authenticate": "Bearer"}}
     # declare
     if exc.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:
-        return JSONResponse(content={"detail": "Validation Error", "message": exc}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return JSONResponse(content={"detail": "Validation Error", "message": exc.detail}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
     
