@@ -16,15 +16,17 @@ app.add_middleware(CORSMiddleware, allow_origins=['http://localhost'],
 
 # routes
 from src.api_user import user
+from src.post import api_post
 
 app.include_router(user)
+app.include_router(api_post)
 
 # add handler of all exception
 # to negate 
-@app.exception_handler(HTTPException)
+"""@app.exception_handler(HTTPException)
 async def api_handler(request: Request, exc: HTTPException):
     return_values = {"request": Request, "headers": {"WWW-Authenticate": "Bearer"}}
     # declare
     if exc.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:
         return JSONResponse(content={"detail": "Validation Error", "message": exc.detail}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    
+    """

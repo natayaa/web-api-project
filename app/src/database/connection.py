@@ -1,4 +1,5 @@
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 
 from passlib.context import CryptContext
@@ -10,6 +11,11 @@ from src.database.orm.user import User, PersonalInformation
 class UserConnection(DatabaseConnection):
     def __init__(self):
         super().__init__()
+
+    def get_user(self, username):
+        query = self.session.query(User).filter_by(username=username).first()
+        
+        return query
 
     def search_existing_user(self, username, email):
         query = self.session.query(User).filter(
@@ -57,4 +63,47 @@ class UserConnection(DatabaseConnection):
         except IntegrityError as e:
             print(str(e))
             self.session.rollback()
+            return False
+
+    def view_userdetail(self, user_id: str) -> dict:
+        query = self.session.query(User).filter_by(user_id = user_id).options(
+            joinedload(User.user_information)
+        ).first()
+        if query:
+            return query
+        else:
+            return None
+        
+    def update_user(self, user_id: int, **update_container):
+        query = self.session.query(User).filter_by(user_id = user_id).options(
+            joinedload(User.user_information)
+        ).first()
+
+        if query:
+            """
+                for key, val in user_update_data.items()
+                    setattr(user, key, val)
+
+                personal_info = user.user_information
+                if personal_info:
+                    for kye, vl in personal_info_update.items():
+                        setattr(personal_info, kye, vl)
+
+                self.session.commit()
+            """
+            pass
+        else:
+            # user not found
+            pass
+
+    def delete_user(self, user_id: int) -> bool:
+        query = self.session.query(User).filter_by(user_id=user_id).options(
+            joinedload(User.user_information)
+        ).first()
+        if query:
+            self.session.delete(query.user_information)
+            self.session.delete(query)
+            self.session.commit()
+            return True
+        else:
             return False
