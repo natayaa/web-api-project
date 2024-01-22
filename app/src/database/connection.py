@@ -27,42 +27,51 @@ class UserConnection(DatabaseConnection):
         else:
             return False
 
-    def create_user(self, **user_payload):
+    async def create_user(self, **user_payload):
         """
-            Return True if username/email doesn't match with existing data from database
-            else return False
+        Creates a new user and personal information record if username and email are unique.
+
+        Returns:
+            True if user creation is successful, False otherwise.
         """
-        user = User()
-        personal_info = PersonalInformation()
         try:
-            if not self.search_existing_user(username=user_payload.get("username"), email=user_payload.get("email")):
-                # create ID to login
-                user.username = user_payload.get("username")
-                user.password = CryptContext(schemes=['bcrypt'], deprecated="auto").hash(user_payload.get("password"))
-                user.email = user_payload.get("email")
-                user.security_key = user_payload.get("security_key")
+            # Check for existing user before creating
 
-                # user detail / personal information of the ID
-                personal_info.firstname = user_payload.get("firstname")
-                personal_info.middlename = user_payload.get("middlename")
-                personal_info.lastname = user_payload.get("lastname")
-                personal_info.phone_number = user_payload.get("phone_number")
-                personal_info.phone_number2 = user_payload.get("phone_number2")
-                personal_info.zipcode = user_payload.get("zipcode")
-                personal_info.nationality = user_payload.get("nationality")
-                personal_info.passcode_id = user_payload.get("passcode_id")
+            if self.search_existing_user(username=user_payload.get("username"), email=user_payload.get("email")):
+                raise ValueError("Username or email already exists.")
 
-                user.user_information = personal_info
+            # Create user and personal information objects
 
-                # commit add
-                self.session.add(user)
-                self.session.commit()
-                return True
-            else:
-                return False
-        except IntegrityError as e:
-            print(str(e))
-            self.session.rollback()
+            user = User(
+                username=user_payload.get("username"),
+                password=CryptContext(schemes=["argon2"], deprecated="auto").hash(user_payload.get("password")),
+                email=user_payload.get("email"),
+                security_key=user_payload.get("security_key"),
+            )
+
+            personal_info = PersonalInformation(
+                firstname=user_payload.get("firstname"),
+                middlename=user_payload.get("middlename"),
+                lastname=user_payload.get("lastname"),
+                phone_number=user_payload.get("phone_number"),
+                phone_number2=user_payload.get("phone_number2"),
+                zipcode=user_payload.get("zipcode"),
+                nationality=user_payload.get("nationality"),
+                passcode_id=user_payload.get("passcode_id"),
+            )
+
+            user.user_information = personal_info
+
+            # Add and commit user and personal information
+
+            self.session.add(user)
+            self.session.commit()
+
+            return True
+
+        except Exception as e:  # Catch broader exceptions for better logging and response
+            print(f"Error creating user: {e}")
+            self.session.rollback()  # Rollback on any error
             return False
 
     def view_userdetail(self, user_id: str) -> dict:

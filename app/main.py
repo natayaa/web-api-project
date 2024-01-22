@@ -29,4 +29,10 @@ async def api_handler(request: Request, exc: HTTPException):
     # declare
     if exc.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:
         return JSONResponse(content={"detail": "Validation Error", "message": exc.detail}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    """
+
+@app.exception_handler(ValueError)
+async def handle_value_error(request: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=400,
+        content={"error": "Invalid request data", "details": str(exc)}
+    )"""
