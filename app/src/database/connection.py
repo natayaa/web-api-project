@@ -4,9 +4,10 @@ from sqlalchemy.exc import IntegrityError
 
 from passlib.context import CryptContext
 
+# import database ORM  Object
 from src.database.orm_db import DatabaseConnection
 from src.database.orm.user import User, PersonalInformation
-
+from src.database.orm.items import Items
 
 class UserConnection(DatabaseConnection):
     def __init__(self):
@@ -116,3 +117,29 @@ class UserConnection(DatabaseConnection):
             return True
         else:
             return False
+        
+
+
+class ItemShop(DatabaseConnection):
+    def __init__(self):
+        super().__init__()
+
+    def add_item(self, **item_container):
+        try:
+            item = Items()
+            item.user_id = item_container.get("user_id")
+            item.item_name = item_container.get("item_name")
+            item.item_qty = item_container.get("item_qty")
+            item.item_price = item_container.get("item_price")
+            item.item_picture = item_container.get("item_picture")
+            self.session.add(item)
+            self.session.commit()
+            return True
+        except IntegrityError as ie:
+            print(str(ie))
+            self.session.rollback()
+            return False
+        
+    def get_items(self, limit: int, offset: int):
+        items = self.session.query(Items).offset(offset).limit(limit).all()
+        return items

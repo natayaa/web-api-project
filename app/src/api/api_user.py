@@ -72,6 +72,8 @@ async def alogin_user(response: Response, login_container: OAuth2PasswordRequest
     access_token = oauth.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     response.status_code = status.HTTP_202_ACCEPTED
     response.headers['Authorization'] = f"Bearer {access_token}"
+    response.headers['Keep-Alive'] = "timeout=2, max=100"
+    response.headers['X-Cross-Ori-Megane'] = "Keywoard"
 
     return {"access_token": access_token, "token_type": "bearer"}
 

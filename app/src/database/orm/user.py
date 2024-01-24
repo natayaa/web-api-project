@@ -25,6 +25,7 @@ class User(Base):
     created_date = Column(String, default=datetime.now().strftime("%Y-%m-%d %H:%M"))
 
     user_information = relationship("PersonalInformation", uselist=False, back_populates="user")
+    items = relationship("Items", uselist=False, back_populates="user")
 
 
 class PersonalInformation(Base):

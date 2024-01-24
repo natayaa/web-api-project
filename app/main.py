@@ -15,11 +15,11 @@ app.add_middleware(CORSMiddleware, allow_origins=['http://localhost'],
                    allow_credentials=True, allow_methods=['*'], allow_headers=["WWW-Authenticate"])
 
 # routes
-from src.api_user import user
-from src.post import api_post
+from src.api.api_user import user
+from src.api.itemshop import items
 
 app.include_router(user)
-app.include_router(api_post)
+app.include_router(items)
 
 # add handler of all exception
 # to negate 
