@@ -23,7 +23,9 @@ async def add_item_endpoint(user_id: str = Depends(get_current_user), item_conta
     return add_item
 
 @items.get("/")
-async def items_list(offset: int = 0, limit: int = 10):
+async def items_list(user_id: str = Depends(get_current_user), offset: int = 0, limit: int = 10):
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     item_list = itemshop.get_items(limit=limit, offset=offset)
     retval = {"itemShop": item_list}
     return retval

@@ -11,7 +11,7 @@ from src.utilities.security_pw import SecurityPassword
 
 secure_pw = SecurityPassword()
 userconn = UserConnection()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/application/api/ver/v1/authentication/auth")
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credential_exc = HTTPException(

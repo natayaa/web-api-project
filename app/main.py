@@ -17,9 +17,11 @@ app.add_middleware(CORSMiddleware, allow_origins=['http://localhost'],
 # routes
 from src.api.api_user import user
 from src.api.itemshop import items
+from src.api.authentication import authenticate
 
 app.include_router(user)
 app.include_router(items)
+app.include_router(authenticate)
 
 # add handler of all exception
 # to negate 

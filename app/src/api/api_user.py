@@ -55,25 +55,3 @@ async def user_detail(current_user: dict = Depends(oauth.get_current_user)):
                  "zipcode": user.user_information.zipcode, "nationality": user.user_information.nationality}
     container = {"username": user.username, "personal_information": info}
     return JSONResponse(content=container, status_code=status.HTTP_200_OK, headers={'WWW-Authenticate': 'Bearer', 'Content-Type': 'application/json'})
-
-
-@user.post("/login")
-async def alogin_user(response: Response, login_container: OAuth2PasswordRequestForm = Depends()):
-    user = await oauth.authenticate_user(username=login_container.username, password=login_container.password)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"message": "You're not registered"})
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={"message": "Password doesn't match"}, headers={"WWW-Authenticate": "Bearer"})
-    elif user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"message": "Username not found"})
-    
-    # create token
-    access_token_expires = timedelta(minutes=30)
-    access_token = oauth.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-    response.status_code = status.HTTP_202_ACCEPTED
-    response.headers['Authorization'] = f"Bearer {access_token}"
-    response.headers['Keep-Alive'] = "timeout=2, max=100"
-    response.headers['X-Cross-Ori-Megane'] = "Keywoard"
-
-    return {"access_token": access_token, "token_type": "bearer"}
-
