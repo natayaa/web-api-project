@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 from src.database.orm_db import DatabaseConnection
 from src.database.orm.user import User, PersonalInformation
 from src.database.orm.items import Items
+from src.database.orm.history_buy import HistoryBuy
 
 class UserConnection(DatabaseConnection):
     def __init__(self):
@@ -143,3 +144,23 @@ class ItemShop(DatabaseConnection):
     def get_items(self, limit: int, offset: int):
         items = self.session.query(Items).offset(offset).limit(limit).all()
         return items
+    
+    def buy_item(self, item_id: int, quantity: int, user_id: str):
+        # select from Items first
+        item = self.session.query(Items).filter_by(item_id = item_id).first()
+        if item:
+            item.item_qty = item.item_qty - quantity
+            self.session.commit()
+            # add to history table
+            history_b = HistoryBuy()
+            history_b.item_name = item.item_name
+            history_b.item_price = item.item_price
+            history_b.quantity = quantity
+            history_b.item_id = item_id
+            history_b.user_id = user_id
+            history_b.total_price = item.item_price * quantity
+            self.session.add(history_b)
+            self.session.commit()
+            return True
+        else:
+            return False

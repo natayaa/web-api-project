@@ -27,3 +27,8 @@ async def items_list(offset: int = 0, limit: int = 10):
     item_list = itemshop.get_items(limit=limit, offset=offset)
     retval = {"itemShop": item_list}
     return retval
+
+@items.post("/buy")
+def buy_item(item_id: str, quantity: int, user_id: str = Depends(get_current_user)):
+    buy_product = itemshop.buy_item(item_id=item_id, quantity=quantity, user_id=user_id.user_id)
+    return buy_product
